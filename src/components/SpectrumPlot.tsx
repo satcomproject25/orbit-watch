@@ -84,16 +84,19 @@ export default function SpectrumPlot({ antenna, live = false }: { antenna: Anten
           <YAxis tick={{ fontSize: 10, fill: "hsl(215 12% 55%)" }} label={{ value: "Power (dBm)", angle: -90, position: "insideLeft", style: { fontSize: 10, fill: "hsl(215 12% 55%)" } }} domain={[-100, -10]} />
           <Tooltip contentStyle={{ background: "hsl(220 18% 10%)", border: "1px solid hsl(220 14% 18%)", borderRadius: 6, fontSize: 11 }} />
           <Line type="monotone" dataKey="noiseFloor" stroke="hsl(45 93% 55%)" strokeWidth={1} strokeDasharray="5 5" dot={false} name="Noise Floor" />
-          <Line type="monotone" dataKey="power" stroke="hsl(190 85% 50%)" strokeWidth={1.5} dot={false} name="Signal Power" />
+          <Line type="monotone" dataKey="power" stroke="hsl(215 12% 40%)" strokeWidth={1} dot={false} name="Signal (all)" />
+          <Line type="monotone" dataKey="authPower" stroke="hsl(142 76% 45%)" strokeWidth={2.5} dot={false} name="Authorized" connectNulls={false} />
+          <Line type="monotone" dataKey="unauthPower" stroke="hsl(0 84% 55%)" strokeWidth={2.5} dot={false} name="Unauthorized" connectNulls={false} />
           {authFreqs.map((f) => (
             <ReferenceLine key={f} x={f} stroke="hsl(142 76% 45% / 0.3)" strokeDasharray="2 2" />
           ))}
         </LineChart>
       </ResponsiveContainer>
       <div className="flex gap-4 mt-2 text-[10px] text-muted-foreground">
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-primary inline-block" /> Signal</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-status-authorized inline-block" /> Authorized</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-status-unauthorized inline-block" /> Unauthorized</span>
         <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-status-warning inline-block" /> Noise Floor</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-status-authorized/30 inline-block" /> Auth. Freq</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-muted-foreground/40 inline-block" /> Signal</span>
       </div>
     </div>
   );
