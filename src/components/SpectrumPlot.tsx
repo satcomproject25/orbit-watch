@@ -49,13 +49,18 @@ function generateSpectrumData(antenna: Antenna, detectedCarriers: number[]) {
 }
 
 export default function SpectrumPlot({ antenna, live = false }: { antenna: Antenna; live?: boolean }) {
-  const [data, setData] = useState(() => generateSpectrumData(antenna));
+  const detectedCarriers = useMemo(() => getDetectedCarriers(antenna), [antenna.id]);
+  const [data, setData] = useState(() => generateSpectrumData(antenna, detectedCarriers));
+
+  useEffect(() => {
+    setData(generateSpectrumData(antenna, detectedCarriers));
+  }, [antenna.authorizedFrequencies, detectedCarriers]);
 
   useEffect(() => {
     if (!live) return;
-    const t = setInterval(() => setData(generateSpectrumData(antenna)), 2000);
+    const t = setInterval(() => setData(generateSpectrumData(antenna, detectedCarriers)), 2000);
     return () => clearInterval(t);
-  }, [antenna, live]);
+  }, [antenna, live, detectedCarriers]);
 
   const authFreqs = useMemo(() => antenna.authorizedFrequencies, [antenna]);
 
