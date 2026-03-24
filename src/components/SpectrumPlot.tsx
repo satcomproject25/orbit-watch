@@ -2,23 +2,48 @@ import { useEffect, useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { Antenna } from "@/lib/antennaData";
 
-function generateSpectrumData(antenna: Antenna) {
+// Fixed "detected" carrier positions per antenna (simulates what the antenna actually receives)
+function getDetectedCarriers(antenna: Antenna): number[] {
+  // Use all authorized freqs plus some extra unauthorized ones as detected carriers
+  const detected = [...antenna.authorizedFrequencies];
+  // Add some unauthorized carriers based on antenna id for consistency
+  const baseFreq = antenna.authorizedFrequencies[0];
+  const range = antenna.authorizedFrequencies[antenna.authorizedFrequencies.length - 1] - baseFreq;
+  if (antenna.unauthorizedCount > 0) {
+    detected.push(baseFreq + Math.round(range * 0.35));
+    if (antenna.unauthorizedCount > 1) {
+      detected.push(baseFreq + Math.round(range * 0.72));
+    }
+  }
+  // Add a few more "received" carriers that aren't necessarily in authorized list
+  detected.push(baseFreq + Math.round(range * 0.15));
+  detected.push(baseFreq + Math.round(range * 0.55));
+  detected.push(baseFreq + Math.round(range * 0.85));
+  // Deduplicate
+  return [...new Set(detected)].sort((a, b) => a - b);
+}
+
+function generateSpectrumData(antenna: Antenna, detectedCarriers: number[]) {
   const points = [];
-  const freqStart = antenna.authorizedFrequencies[0] - 50;
-  const freqEnd = antenna.authorizedFrequencies[antenna.authorizedFrequencies.length - 1] + 50;
+  const allFreqs = detectedCarriers;
+  const freqStart = Math.min(...allFreqs) - 50;
+  const freqEnd = Math.max(...allFreqs) + 50;
   const step = 2;
   for (let f = freqStart; f <= freqEnd; f += step) {
+    const nearDetected = detectedCarriers.some((cf) => Math.abs(f - cf) < 10);
     const isAuth = antenna.authorizedFrequencies.some((af) => Math.abs(f - af) < 10);
     const noiseFloor = -90 + Math.random() * 5;
     let power = noiseFloor;
-    if (isAuth) {
+    if (nearDetected) {
       power = -30 + Math.random() * 15;
     }
-    // simulate unauthorized spike
-    if (antenna.unauthorizedCount > 0 && f === antenna.authorizedFrequencies[2] + 25) {
-      power = -40 + Math.random() * 10;
-    }
-    points.push({ freq: f, power: Math.round(power * 10) / 10, noiseFloor: -88 });
+    points.push({
+      freq: f,
+      power: Math.round(power * 10) / 10,
+      authPower: nearDetected && isAuth ? Math.round(power * 10) / 10 : undefined,
+      unauthPower: nearDetected && !isAuth ? Math.round(power * 10) / 10 : undefined,
+      noiseFloor: -88,
+    });
   }
   return points;
 }
