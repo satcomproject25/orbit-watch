@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/lib/auth";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AntennaDetail from "./pages/AntennaDetail";
+import AntennaSpectrum from "./pages/AntennaSpectrum";
 import AntennaMap from "./pages/AntennaMap";
 import FrequencyManager from "./pages/FrequencyManager";
 import DatasetMonitoring from "./pages/DatasetMonitoring";
@@ -29,6 +30,7 @@ function AppRoutes() {
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/antenna/:slug" element={<ProtectedRoute><AntennaDetail /></ProtectedRoute>} />
+      <Route path="/antenna/:slug/spectrum" element={<ProtectedRoute><AntennaSpectrum /></ProtectedRoute>} />
       <Route path="/map" element={<ProtectedRoute><AntennaMap /></ProtectedRoute>} />
       <Route path="/frequencies" element={<ProtectedRoute><FrequencyManager /></ProtectedRoute>} />
       <Route path="/dataset" element={<ProtectedRoute><DatasetMonitoring /></ProtectedRoute>} />
