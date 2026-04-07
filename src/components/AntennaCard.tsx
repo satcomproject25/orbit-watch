@@ -55,7 +55,7 @@ export default function AntennaCard({ antenna }: { antenna: Antenna }) {
           </Link>
         </Button>
         <Button asChild size="sm" className="flex-1 text-xs bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20">
-          <Link to={`/antenna/${antenna.slug}#spectrum`}>
+          <Link to={`/antenna/${antenna.slug}/spectrum`}>
             <BarChart3 className="h-3 w-3 mr-1" /> Spectrum
           </Link>
         </Button>
